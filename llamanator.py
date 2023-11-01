@@ -1,6 +1,12 @@
 import sys
-from chat import setup_openai, complete
-from ui import bot_print, system_print, init_ui
+from chat import complete, over_db, init_chat
+from ui import bot_print, system_print
+from document import load_textfile, ingest_docs
+from state import knowledge_store
+
+"""
+Main entry point for llamantor
+"""
 
 
 def parse_input():
@@ -18,6 +24,17 @@ def parse_input():
     elif cleaned == "/quit" or cleaned == "/q":
         system_print("Bye!")
         sys.exit(0)
+    elif cleaned.startswith("/ingest "):
+        parts = cleaned.split(maxsplit=1)
+        fname = parts[1]
+        docs = load_textfile(fname)
+        ingest_docs(knowledge_store, docs)
+        system_print(f"Ingested file: {fname}")
+    elif cleaned.startswith("/ask "):
+        parts = cleaned.split(maxsplit=1)
+        query = parts[1]
+        response = over_db(knowledge_store, query)
+        bot_print(response)
     elif cleaned.startswith("/"):
         system_print("Unknown command: " + cleaned)
     else:
@@ -34,6 +51,7 @@ def main():
 
 
 if __name__ == "__main__":
-    init_ui()
-    setup_openai("You are a helpful AI assistant that helps with programming tasks.")
+    init_chat(
+        "You are a helpful AI assistant that helps with programming tasks."
+    )
     main()

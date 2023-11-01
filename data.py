@@ -1,6 +1,10 @@
 from functools import reduce
 import os
 
+"""
+Data Models
+"""
+
 
 class ChatMessage:
     def __init__(self, role, content):
@@ -31,7 +35,9 @@ class ChatHistory:
 
     def token_length(self):
         return reduce(
-            (lambda cumm, curr: cumm + curr.get_content_length()), self.messages, 0
+            (lambda total, curr: total + curr.get_content_length()),
+            self.messages,
+            0,
         )
 
     def is_too_long(self):
