@@ -1,6 +1,7 @@
 from rich.console import Console
 from rich.text import Text
 from rich.style import Style
+import os
 import readline  # needed to move the cursor using arrow keys
 
 """
@@ -32,7 +33,7 @@ def system_print(str):
 
 def print_sources(docs):
     console.print(
-        "\n".join(
+        f"{os.linesep}".join(
             [
                 " - " + f"{d.metadata['page']}" + f"{d.metadata['source']}"
                 for d in docs

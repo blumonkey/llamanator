@@ -1,10 +1,9 @@
 from langchain.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from transformers import LlamaTokenizerFast
-
+import os
 from common import hash_id
 from ui import show_spinner
-
 from logger import logging
 
 """
@@ -21,11 +20,6 @@ def load_textfile(fname):
     )
     loader = TextLoader(fname)
     return loader.load_and_split(splitter)
-
-
-def similarity(db, query, k=4):
-    """Similarity search."""
-    return db.similarity_search(query, k=k)
 
 
 def ingest_docs(db, docs):
@@ -52,9 +46,9 @@ def ingest_docs(db, docs):
 
 def format_docs(docs):
     """Format a list of langchain Document objects for passing to the chat agent"""
-    return "\n".join(
+    return f"{os.linesep}".join(
         [
-            f"{d.metadata.get('source', '')}\n{d.metadata.get('time', '---')}\n{d.page_content}"
+            f"{d.metadata.get('source', '')}{os.linesep}{d.metadata.get('time', '---')}{os.linesep}{d.page_content}"
             for d in docs
         ]
     )

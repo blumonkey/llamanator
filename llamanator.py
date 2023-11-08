@@ -1,7 +1,7 @@
 import sys
-from chat import complete, over_db, init_chat
+from chat import Chat
 from ui import bot_print, system_print
-from document import load_textfile, ingest_docs
+from documents import load_textfile, ingest_docs
 from state import knowledge_store
 
 """
@@ -9,7 +9,7 @@ Main entry point for llamantor
 """
 
 
-def parse_input():
+def parse_input(chat):
     try:
         user_input = input("> ")
         if user_input is None:
@@ -33,25 +33,25 @@ def parse_input():
     elif cleaned.startswith("/ask "):
         parts = cleaned.split(maxsplit=1)
         query = parts[1]
-        response = over_db(knowledge_store, query)
+        response = chat.over_db(knowledge_store, query)
         bot_print(response)
     elif cleaned.startswith("/"):
         system_print("Unknown command: " + cleaned)
     else:
-        response = complete(cleaned)
+        response = chat.complete(cleaned)
         bot_print(response)
 
 
-def main():
+def main(chat):
     while True:
         try:
-            parse_input()
+            parse_input(chat)
         except (SystemExit, KeyboardInterrupt) as e:
             raise e
 
 
 if __name__ == "__main__":
-    init_chat(
+    chat = Chat(
         "You are a helpful AI assistant that helps with programming tasks."
     )
-    main()
+    main(chat)
