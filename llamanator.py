@@ -28,8 +28,7 @@ def parse_input(chat):
         parts = cleaned.split(maxsplit=1)
         fname = parts[1]
         docs = load_textfile(fname)
-        ingest_docs(knowledge_store, docs)
-        system_print(f"Ingested file: {fname}")
+        ingest_docs(fname, knowledge_store, docs)
     elif cleaned.startswith("/ask "):
         parts = cleaned.split(maxsplit=1)
         query = parts[1]

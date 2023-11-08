@@ -3,7 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from transformers import LlamaTokenizerFast
 import os
 from common import hash_id
-from ui import show_spinner
+from ui import show_spinner, system_print
 from logger import logging
 
 """
@@ -22,12 +22,10 @@ def load_textfile(fname):
     return loader.load_and_split(splitter)
 
 
-def ingest_docs(db, docs):
+def ingest_docs(fname, db, docs):
     """Ingest a Document list into the vector db.
     The id is a hash of the Document, since it must be unique.
     This means it's impossible to replace a document with this hashing scheme.
-
-    TODO: Check that this is WAI
     """
     ids = (hash_id(str(d)) for d in docs)
     docs_map = dict(zip(ids, docs))
@@ -41,7 +39,10 @@ def ingest_docs(db, docs):
         if len(new_ids):
             db.add_documents(new_docs, ids=new_ids)
             logging.info(f"Saving vector store to {db.path}/.")
+            system_print(f"Ingested file: {fname}")
             return db.save_local(db.path)
+        else:
+            system_print("Ignored file due to duplicates in the store...")
 
 
 def format_docs(docs):
