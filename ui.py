@@ -12,6 +12,7 @@ LIGHT_BLUE = "#A5E6F7"
 LIGHT_YELLOW = "#FFF7DF"
 bot_style = Style(color=LIGHT_BLUE, bold=True)
 system_style = Style(color=LIGHT_YELLOW, bold=True)
+debug_style = Style(color="white", bgcolor="red", bold=True)
 console = Console(width=50, height=16)
 
 
@@ -25,6 +26,10 @@ def show_spinner(context=""):
 
 def bot_print(str):
     console.print(str, style=bot_style)
+
+
+def debug_print(str):
+    console.print(str, style=debug_style)
 
 
 def system_print(str):

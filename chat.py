@@ -1,6 +1,6 @@
-from extractors import text_extract, summarize_context
+from extractors import text_extract, summarize_context, function_extract
 from ui import print_sources, show_spinner
-from data import ChatHistory
+from data import ChatHistory, Parameter, Function
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
 import os
 from documents import format_docs
@@ -53,6 +53,25 @@ class Chat:
         retriever = db.as_retriever()
         docs = retriever.invoke(query)
         response = self.__over_docs(query, docs=docs, sources=sources)
+        self.history.add_messages(
+            HumanMessage(content=query),
+            AIMessage(content=response),
+        )
+        return response
+
+    def over_function(self, query):
+        # TODO: make this a configurable set of functions
+        parameter = Parameter(
+            "city_name", "string", "The name of the city, provided as a string"
+        )
+        function = Function(
+            "get_weather",
+            "Fetches the current temperature in Celsius at city provided",
+            parameters=[parameter],
+        )
+        response = ""
+        with show_spinner("Using functions..."):
+            response = function_extract(query, function)
         self.history.add_messages(
             HumanMessage(content=query),
             AIMessage(content=response),

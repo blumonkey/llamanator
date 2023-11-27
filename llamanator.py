@@ -34,6 +34,11 @@ def parse_input(chat):
         query = parts[1]
         response = chat.over_db(knowledge_store, query)
         bot_print(response)
+    elif cleaned.startswith("/function "):
+        parts = cleaned.split(maxsplit=1)
+        query = parts[1]
+        response = chat.over_function(query)
+        bot_print(response)
     elif cleaned.startswith("/"):
         system_print("Unknown command: " + cleaned)
     else:
@@ -50,7 +55,5 @@ def main(chat):
 
 
 if __name__ == "__main__":
-    chat = Chat(
-        "You are a helpful AI assistant that helps with programming tasks."
-    )
+    chat = Chat("You are a helpful AI assistant.")
     main(chat)

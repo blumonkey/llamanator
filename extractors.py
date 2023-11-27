@@ -1,7 +1,7 @@
 from api import chat_completion
 from data import ChatHistory
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
-import os
+from langchain.schema import HumanMessage, SystemMessage
+from ui import debug_print
 
 """
 Methods that perform specific tasks using the chat API, 
@@ -42,5 +42,86 @@ def text_extract(query, text):
             
             Text: {text}""",
         ),
+    )
+    return chat_completion(history)
+
+
+def function_extract(query, function):
+    # TODO support multiple functions, optimize the prompt
+    """Utilize provided to function to answer a query."""
+
+    system_message = """
+    You are a AI assistant who answers queries using the functions provieded. You will not provide any explanation for your answers. If the 
+    query cannot be answered with the provided information, reply with "N/A". 
+
+    Repeat, DO NOT PROVIDE ANY EXPLANATIONS OR CORRECTIONS IN YOUR RESPONSE, only respond with the funciton call or "N/A". 
+    Here are some examples:
+
+    Example 1:
+    ----------
+
+    Function: {
+        "type": "function",
+        "function": {
+            "name": "add_numbers",
+            "description": "Add two integers",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "a": {
+                        "type": "number",
+                        "description": "The first number to add",
+                    },
+                    "b": {
+                        "type": "number",
+                        "description": "The second number to add",
+                    },
+                },
+                "required": ["a", "b"],
+            },
+        },
+    }
+    Query: How do I add 75 and 144?
+
+    Answer: add_numbers(75, 144)
+
+    Example 2:
+    ----------
+
+    Function: {
+        "type": "function",
+        "function": {
+            "name": "convert_to_uppercase",
+            "description": "Converts a string to uppercase",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "inp": {
+                        "type": "string",
+                        "description": "The string to convert to uppercase",
+                    },
+                },
+                "required": ["inp"],
+            },
+        },
+    }
+    Query: Convert "Hello Barbie!" to uppercase.
+
+    Answer: convert_to_uppercase("Hello Barbie!")
+    """
+    message_content = f"""
+    Now here is the function and query you should answer:
+
+    Function: {function.get_json()}
+    Query: {query}
+
+    Answer: 
+    """
+    debug_print(system_message)
+    debug_print(message_content)
+    history = ChatHistory()
+    history.add_messages(
+        SystemMessage(content=system_message),
+        HumanMessage(content=message_content),
     )
     return chat_completion(history)

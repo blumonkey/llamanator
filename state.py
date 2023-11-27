@@ -3,7 +3,9 @@ from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.docstore.in_memory import InMemoryDocstore
 
-embedding = HuggingFaceEmbeddings(model_name="all-mpnet-base-v2")
+embedding = HuggingFaceEmbeddings(
+    model_name="all-mpnet-base-v2", model_kwargs={"device": "cpu"}
+)
 
 """
 Handles the knowledge store 
