@@ -1,6 +1,12 @@
 from functools import reduce
-from langchain.schema.messages import BaseMessage
+from langchain.schema.messages import (
+    BaseMessage,
+    HumanMessage,
+    SystemMessage,
+    AIMessage,
+)
 import json
+from enum import Enum
 
 """
 Data Models
@@ -34,6 +40,37 @@ class ChatHistory:
 
     def get_messages(self):
         return self.messages
+
+    def __msg_to_string(self, msg: BaseMessage):
+        if isinstance(msg, AIMessage):
+            return f"ASSISTANT: {msg.content}"
+        elif isinstance(msg, HumanMessage):
+            return f"USER: {msg.content}"
+        elif isinstance(msg, SystemMessage):
+            return f"{msg.content}"
+        else:
+            return ""
+
+    def format(self):
+        return "\n".join(
+            list(
+                map(
+                    self.__msg_to_string,
+                    self.messages + [AIMessage(content="")],
+                )
+            )
+        )
+
+
+class ChatType(Enum):
+    """
+    Enum to denote the types of chats supported. CHAT is equivalent to
+    OpenAI chat format, (`chat` in oobagooba) whereas prompt is the instruction style
+    format used by Vicuna (`instruct` in oobagooba)
+    """
+
+    CHAT = "chat"
+    INSTRUCT = "instruct"
 
 
 class Parameter:
