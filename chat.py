@@ -6,14 +6,17 @@ from extractors import (
 from ui import print_sources, show_spinner
 from data import ChatHistory, Parameter, Function, ChatType
 from langchain.prompts import (
-    SystemMessagePromptTemplate,
     HumanMessagePromptTemplate,
     AIMessagePromptTemplate,
+)
+from langchain.schema.messages import (
+    SystemMessage,
 )
 
 import os
 from documents import format_docs
 from api import chat_completion, prompt_completion
+from config import get_config
 
 
 class Chat:
@@ -22,31 +25,21 @@ class Chat:
     as a chat assistant or query over docs/texts in the knowledge store
     """
 
-    history = ChatHistory(max_length=100)
-    DEFAULT_MESSAGE_TEMPLATE = "{message}"
+    config = get_config()
+    history = ChatHistory(max_length=config["runtime"]["max_history_size"])
+    system_prompt = config["bot"]["system_prompt"]
+    user_prompt_template = config["bot"]["user_prompt_template"]
+    ai_prompt_template = config["bot"]["ai_prompt_template"]
+    chat_type = config["bot"]["chat_type"]
 
-    def __init__(
-        self,
-        system_prompt,
-        chat_type=ChatType.CHAT,
-    ):
-        self.chat_type = chat_type
-        self.system_message_prompt_template = (
-            SystemMessagePromptTemplate.from_template(
-                self.DEFAULT_MESSAGE_TEMPLATE
-            )
-        )
+    def __init__(self):
         self.user_message_prompt_template = (
-            HumanMessagePromptTemplate.from_template(
-                self.DEFAULT_MESSAGE_TEMPLATE
-            )
+            HumanMessagePromptTemplate.from_template(self.user_prompt_template)
         )
         self.ai_message_prompt_template = AIMessagePromptTemplate.from_template(
-            self.DEFAULT_MESSAGE_TEMPLATE
+            self.ai_prompt_template
         )
-        self.history.add_message(
-            self.__get_system_message(content=system_prompt)
-        )
+        self.history.add_message(SystemMessage(content=self.system_prompt))
 
     def complete(self, prompt):
         with show_spinner():
@@ -72,10 +65,10 @@ class Chat:
             + f". Here is a summary of the conversation so far: {os.linesep}"
             + response_text
         )
-        self.history = ChatHistory(max_length=1900)
-        self.history.add_messages(
-            self.__get_system_message(content=system_prompt),
+        self.history = ChatHistory(
+            max_length=self.config["runtime"]["max_history_size"]
         )
+        self.history.add_messages(SystemMessage(content=system_prompt))
 
     def __over_text(self, query, text):
         with show_spinner("Extracting info..."):
@@ -116,9 +109,6 @@ class Chat:
             self.__get_ai_message(content=response),
         )
         return response
-
-    def __get_system_message(self, content):
-        return self.system_message_prompt_template.format(message=content)
 
     def __get_human_message(self, content):
         return self.user_message_prompt_template.format(message=content)

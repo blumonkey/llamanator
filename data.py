@@ -42,21 +42,14 @@ class ChatHistory:
         return self.messages
 
     def __msg_to_string(self, msg: BaseMessage):
-        if isinstance(msg, AIMessage):
-            return f"ASSISTANT: {msg.content}"
-        elif isinstance(msg, HumanMessage):
-            return f"USER: {msg.content}"
-        elif isinstance(msg, SystemMessage):
-            return f"{msg.content}"
-        else:
-            return ""
+        return msg.content
 
     def format(self):
         return "\n".join(
             list(
                 map(
                     self.__msg_to_string,
-                    self.messages + [AIMessage(content="")],
+                    self.messages + [AIMessage(content="ASSISTANT: ")],
                 )
             )
         )

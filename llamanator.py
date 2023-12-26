@@ -1,6 +1,5 @@
 import sys
 from chat import Chat
-from data import ChatType
 from ui import bot_print, system_print
 from documents import load_textfile, ingest_docs
 from state import knowledge_store
@@ -56,5 +55,5 @@ def main(chat):
 
 
 if __name__ == "__main__":
-    chat = Chat("You are a helpful AI assistant.", chat_type=ChatType.INSTRUCT)
+    chat = Chat()
     main(chat)

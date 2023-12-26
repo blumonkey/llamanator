@@ -5,18 +5,24 @@ import os
 from common import hash_id
 from ui import show_spinner, system_print
 from logger import logging
+from config import get_config
+
 
 """
 Methods that work with documents or document vectors
 """
 
+config = get_config()
+tmodel = config["storage"]["tokenizer"]
+chunk_size = config["storage"]["chunk_size_tokens"]
+
 
 def load_textfile(fname):
-    tokenizer = LlamaTokenizerFast.from_pretrained("oobabooga/llama-tokenizer")
+    tokenizer = LlamaTokenizerFast.from_pretrained(tmodel)
     tokenizer.add_eos_token = True
 
     splitter = RecursiveCharacterTextSplitter.from_huggingface_tokenizer(
-        tokenizer=tokenizer, chunk_size=380
+        tokenizer=tokenizer, chunk_size=chunk_size
     )
     loader = TextLoader(fname)
     return loader.load_and_split(splitter)

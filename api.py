@@ -1,10 +1,11 @@
-import os
 from langchain.chat_models import ChatOpenAI
 from langchain.llms import OpenAI
+from config import get_config
 
-OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+config = get_config()
 
+OPENAI_API_BASE = config["bot"]["openai_api_base"]
+OPENAI_API_KEY = config["bot"]["openai_api_key"]
 
 """
 Handles API calls to the OPENAI API
@@ -28,6 +29,7 @@ def chat_completion(history):
 
 
 def prompt_completion(prompt):
+    print(prompt)
     llm = OpenAI(openai_api_base=OPENAI_API_BASE, openai_api_key=OPENAI_API_KEY)
     try:
         return llm.invoke(prompt)

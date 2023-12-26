@@ -1,0 +1,32 @@
+# Example config file. Make a copy of this file and rename as "config.toml" to 
+# start using llamanator
+
+[storage]
+embedding = "all-mpnet-base-v2"
+tokenizer = "oobabooga/llama-tokenizer"
+chunk_size_tokens = 380
+path = "storage"
+
+
+[bots]
+[bots.phind]
+chat_type="CHAT"
+system_prompt = "You are a helpful AI assistant."
+openai_api_base = "open-ai-base"                                     # replace with openai base
+openai_api_key = "open-ai-key"                                       # replace with openai key
+user_prompt_template = "{message}"
+ai_prompt_template = "{message}"
+
+
+[bots.airoboros]
+chat_type="INSTRUCT"
+system_prompt = "SYSTEM: You are a helpful AI assistant."
+openai_api_base = "open-ai-base"                                     # replace with openai base
+openai_api_key = "open-ai-key"                                       # replace with openai key
+user_prompt_template = "USER: {message}"
+ai_prompt_template = "ASSISTANT: {message}"
+
+
+[runtime]
+max_history_size = 1000
+bot = "airoboros"
